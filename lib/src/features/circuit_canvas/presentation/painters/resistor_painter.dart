@@ -11,18 +11,18 @@ class ResistorPainter extends CustomPainter {
   /// Grid size used for snapping coordinates (defaults to 20.0).
   final double gridSize;
 
-  /// Color of the resistor lines.
+  /// Color of the resistor lines. Defaults to Sky Blue (#38BDF8) for dark background high contrast.
   final Color color;
 
-  /// Stroke width of the resistor lines.
+  /// Stroke width of the resistor lines. Defaults to 3.0.
   final double strokeWidth;
 
   const ResistorPainter({
     this.start = const Offset(0, 20),
     this.end = const Offset(100, 20),
     this.gridSize = 20.0,
-    this.color = Colors.black,
-    this.strokeWidth = 2.0,
+    this.color = const Color(0xFF38BDF8),
+    this.strokeWidth = 3.0,
   });
 
   /// Snaps a value to the nearest grid step.

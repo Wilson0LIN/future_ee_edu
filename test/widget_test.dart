@@ -1,30 +1,31 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:future_ee_edu/main.dart';
+import 'package:future_ee_edu/src/features/circuit_canvas/presentation/circuit_canvas_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets(
+    'CircuitApp renders CircuitCanvasScreen with title and info overlay',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(const CircuitApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      // Verify AppBar title is present
+      expect(find.text('Circuit Topology Canvas'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      // Verify CircuitCanvasScreen widget is in tree
+      expect(find.byType(CircuitCanvasScreen), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+      // Verify topology text overlay is displayed
+      expect(find.text('Topology: Series-Parallel Circuit'), findsOneWidget);
+      expect(
+        find.text('Grid: 20px x 20px | Orthogonal 90° Wires'),
+        findsOneWidget,
+      );
+
+      // Verify component labels
+      expect(find.text('R1 (Series: 100 Ω)'), findsOneWidget);
+      expect(find.text('R2 (Parallel: 200 Ω)'), findsOneWidget);
+      expect(find.text('R3 (Parallel: 200 Ω)'), findsOneWidget);
+      expect(find.text('V1 (12V)'), findsOneWidget);
+    },
+  );
 }
