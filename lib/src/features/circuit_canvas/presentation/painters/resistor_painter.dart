@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// CustomPainter for rendering an IEEE standard zigzag resistor on a grid canvas.
+/// CustomPainter for rendering an IEEE standard zigzag resistor with 3Blue1Brown aesthetics.
 class ResistorPainter extends CustomPainter {
   /// Start position of the resistor component.
   final Offset start;
@@ -11,18 +11,22 @@ class ResistorPainter extends CustomPainter {
   /// Grid size used for snapping coordinates (defaults to 20.0).
   final double gridSize;
 
-  /// Color of the resistor lines.
+  /// Color of the resistor lines (defaults to 3b1b Neon Amber #F59E0B).
   final Color color;
 
-  /// Stroke width of the resistor lines.
+  /// Stroke width of the resistor lines (defaults to 3.5px).
   final double strokeWidth;
+
+  /// Optional label to display (e.g., "R1 (10Ω)").
+  final String? label;
 
   const ResistorPainter({
     this.start = const Offset(0, 20),
     this.end = const Offset(100, 20),
     this.gridSize = 20.0,
-    this.color = Colors.black,
-    this.strokeWidth = 2.0,
+    this.color = const Color(0xFFF59E0B), // 3b1b Neon Amber
+    this.strokeWidth = 3.5,
+    this.label,
   });
 
   /// Snaps a value to the nearest grid step.
@@ -56,15 +60,58 @@ class ResistorPainter extends CustomPainter {
     final p1 = pins[0];
     final p2 = pins[1];
 
-    final paint = Paint()
+    final path = getResistorPath(p1, p2);
+
+    // Subtle neon glow pass
+    final glowPaint = Paint()
+      ..color = color.withValues(alpha: 0.6)
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    canvas.drawPath(path, glowPaint);
+
+    // Core crisp line pass
+    final corePaint = Paint()
       ..color = color
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
+    canvas.drawPath(path, corePaint);
 
-    final path = getResistorPath(p1, p2);
-    canvas.drawPath(path, paint);
+    // Draw component label if provided
+    if (label != null && label!.isNotEmpty) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: label,
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(color: color.withValues(alpha: 0.8), blurRadius: 4),
+            ],
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      final midPoint = Offset((p1.dx + p2.dx) / 2, (p1.dy + p2.dy) / 2);
+      // Offset perpendicular to the orientation
+      final vector = p2 - p1;
+      final distance = vector.distance;
+      final offsetDirection = distance > 0
+          ? Offset(-vector.dy / distance, vector.dx / distance)
+          : const Offset(0, -1);
+
+      final labelPos =
+          midPoint +
+          offsetDirection * 22 -
+          Offset(textPainter.width / 2, textPainter.height / 2);
+      textPainter.paint(canvas, labelPos);
+    }
   }
 
   /// Computes the IEEE zigzag path between [p1] and [p2].
@@ -120,6 +167,7 @@ class ResistorPainter extends CustomPainter {
         oldDelegate.end != end ||
         oldDelegate.gridSize != gridSize ||
         oldDelegate.color != color ||
-        oldDelegate.strokeWidth != strokeWidth;
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.label != label;
   }
 }
