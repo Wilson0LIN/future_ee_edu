@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:future_ee_edu/src/features/circuit_canvas/presentation/painters/component_orientation.dart';
 import 'package:future_ee_edu/src/features/circuit_canvas/presentation/painters/grid_painter.dart';
 import 'package:future_ee_edu/src/features/circuit_canvas/presentation/painters/resistor_painter.dart';
 import 'package:future_ee_edu/src/features/circuit_canvas/presentation/painters/voltage_source_painter.dart';
@@ -28,6 +29,20 @@ void main() {
       expect(painter.strokeWidth, equals(3.5));
     });
 
+    test('ResistorPainter.fromCenter dynamically computes pinPositions', () {
+      final painter = ResistorPainter.fromCenter(
+        center: const Offset(300, 160),
+        orientation: ComponentOrientation.deg0,
+        length: 160,
+      );
+
+      final pins = painter.pinPositions;
+      expect(pins[0], equals(const Offset(220, 160)));
+      expect(pins[1], equals(const Offset(380, 160)));
+      expect(painter.centerPosition, equals(const Offset(300, 160)));
+      expect(painter.effectiveOrientation, equals(ComponentOrientation.deg0));
+    });
+
     test('VoltageSourcePainter pinPositions and 3b1b defaults', () {
       const painter = VoltageSourcePainter(
         start: Offset(101.0, 160.0),
@@ -41,6 +56,23 @@ void main() {
       expect(painter.color, equals(const Color(0xFF38BDF8)));
       expect(painter.strokeWidth, equals(3.5));
     });
+
+    test(
+      'VoltageSourcePainter.fromCenter dynamically computes pinPositions',
+      () {
+        final painter = VoltageSourcePainter.fromCenter(
+          center: const Offset(100, 260),
+          orientation: ComponentOrientation.deg90,
+          length: 200,
+        );
+
+        final pins = painter.pinPositions;
+        expect(pins[0], equals(const Offset(100, 160)));
+        expect(pins[1], equals(const Offset(100, 360)));
+        expect(painter.positivePin, equals(const Offset(100, 160)));
+        expect(painter.negativePin, equals(const Offset(100, 360)));
+      },
+    );
 
     test('WirePainter pinPositions and 3b1b defaults', () {
       const painter = WirePainter(

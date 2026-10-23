@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../painters/component_orientation.dart';
 import '../painters/grid_painter.dart';
 import '../painters/resistor_painter.dart';
 import '../painters/voltage_source_painter.dart';
@@ -73,19 +75,19 @@ class _SeriesParallelCircuitPainter extends CustomPainter {
     const skyBlue = Color(0xFF38BDF8);
     const neonAmber = Color(0xFFF59E0B);
 
-    // 1. DC Voltage Source (Left)
-    const vsStart = Offset(100, 160);
-    const vsEnd = Offset(100, 360);
-    final voltageSource = VoltageSourcePainter(
-      start: vsStart,
-      end: vsEnd,
+    // 1. DC Voltage Source (Left Branch)
+    final voltageSource = VoltageSourcePainter.fromCenter(
+      center: const Offset(100, 260),
+      orientation: ComponentOrientation.deg90,
+      length: 200.0,
       color: skyBlue,
       strokeWidth: 3.5,
-      label: 'Vs (12V)',
+      label: r'$V_s = 12\,\text{V}$',
+      drawTerminalDots: true,
     );
     voltageSource.paint(canvas, size);
 
-    // 2. Wire from Voltage Source (+) to Main Series Resistor R1
+    // 2. Wire from Voltage Source (+) (100, 160) to Main Series Resistor R1 (220, 160)
     const w1 = WirePainter(
       points: [Offset(100, 160), Offset(220, 160)],
       color: skyBlue,
@@ -94,18 +96,18 @@ class _SeriesParallelCircuitPainter extends CustomPainter {
     w1.paint(canvas, size);
 
     // 3. Main Series Resistor R1 (Top Path)
-    const r1Start = Offset(220, 160);
-    const r1End = Offset(380, 160);
-    final r1 = ResistorPainter(
-      start: r1Start,
-      end: r1End,
+    final r1 = ResistorPainter.fromCenter(
+      center: const Offset(300, 160),
+      orientation: ComponentOrientation.deg0,
+      length: 160.0,
       color: neonAmber,
       strokeWidth: 3.5,
-      label: 'R1 (10Ω)',
+      label: r'$R_1 = 10\,\Omega$',
+      drawTerminalDots: true,
     );
     r1.paint(canvas, size);
 
-    // 4. Wire from R1 to Parallel Split Node
+    // 4. Wire from R1 (380, 160) to Parallel Split Node (500, 160)
     const w2 = WirePainter(
       points: [Offset(380, 160), Offset(500, 160)],
       color: skyBlue,
@@ -122,12 +124,14 @@ class _SeriesParallelCircuitPainter extends CustomPainter {
     );
     wR2Top.paint(canvas, size);
 
-    final r2 = ResistorPainter(
-      start: const Offset(500, 200),
-      end: const Offset(500, 320),
+    final r2 = ResistorPainter.fromCenter(
+      center: const Offset(500, 260),
+      orientation: ComponentOrientation.deg90,
+      length: 120.0,
       color: neonAmber,
       strokeWidth: 3.5,
-      label: 'R2 (20Ω)',
+      label: r'$R_2 = 20\,\Omega$',
+      drawTerminalDots: true,
     );
     r2.paint(canvas, size);
 
@@ -147,12 +151,14 @@ class _SeriesParallelCircuitPainter extends CustomPainter {
     );
     wR3TopExtension.paint(canvas, size);
 
-    final r3 = ResistorPainter(
-      start: const Offset(660, 200),
-      end: const Offset(660, 320),
+    final r3 = ResistorPainter.fromCenter(
+      center: const Offset(660, 260),
+      orientation: ComponentOrientation.deg90,
+      length: 120.0,
       color: neonAmber,
       strokeWidth: 3.5,
-      label: 'R3 (20Ω)',
+      label: r'$R_3 = 20\,\Omega$',
+      drawTerminalDots: true,
     );
     r3.paint(canvas, size);
 
@@ -164,7 +170,7 @@ class _SeriesParallelCircuitPainter extends CustomPainter {
     );
     wR3BottomExtension.paint(canvas, size);
 
-    // 7. Main Return Wire back to DC Voltage Source (-)
+    // 7. Main Return Wire back to DC Voltage Source (-) (100, 360)
     const wReturn = WirePainter(
       points: [Offset(500, 360), Offset(100, 360)],
       color: skyBlue,
